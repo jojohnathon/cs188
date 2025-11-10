@@ -102,7 +102,34 @@ def joinFactors(factors: List[Factor]):
 
 
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    factors = list(factors)
+    
+    if len(factors) == 0:
+        return Factor([], [], {})
+    
+    if len(factors) == 1:
+        return factors[0]
+    
+    unconditionedVariables = set()
+    conditionedVariables = set()
+    
+    for factor in factors:
+        unconditionedVariables.update(factor.unconditionedVariables())
+        conditionedVariables.update(factor.conditionedVariables())
+    
+    conditionedVariables = conditionedVariables - unconditionedVariables
+    
+    variableDomainsDict = factors[0].variableDomainsDict()
+    
+    joinedFactor = Factor(list(unconditionedVariables), list(conditionedVariables), variableDomainsDict)
+    
+    for assignment in joinedFactor.getAllPossibleAssignmentDicts():
+        prob = 1.0
+        for factor in factors:
+            prob *= factor.getProbability(assignment)
+        joinedFactor.setProbability(assignment, prob)
+    
+    return joinedFactor
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
@@ -153,7 +180,24 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        unconditionedVariables = list(factor.unconditionedVariables())
+        unconditionedVariables.remove(eliminationVariable)
+        
+        conditionedVariables = list(factor.conditionedVariables())
+        
+        variableDomainsDict = factor.variableDomainsDict()
+        
+        resultFactor = Factor(unconditionedVariables, conditionedVariables, variableDomainsDict)
+        
+        for assignment in resultFactor.getAllPossibleAssignmentDicts():
+            total_prob = 0.0
+            for value in variableDomainsDict[eliminationVariable]:
+                extended_assignment = assignment.copy()
+                extended_assignment[eliminationVariable] = value
+                total_prob += factor.getProbability(extended_assignment)
+            resultFactor.setProbability(assignment, total_prob)
+        
+        return resultFactor
         "*** END YOUR CODE HERE ***"
 
     return eliminate
