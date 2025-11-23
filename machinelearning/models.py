@@ -42,6 +42,7 @@ class PerceptronModel(Module):
         super(PerceptronModel, self).__init__()
 
         "*** YOUR CODE HERE ***"
+        self.w = Parameter(ones(1, dimensions))
 
 
     def get_weights(self):
@@ -61,6 +62,7 @@ class PerceptronModel(Module):
         The pytorch function `tensordot` may be helpful here.
         """
         "*** YOUR CODE HERE ***"
+        return tensordot(self.get_weights(), x)
 
         
 
@@ -73,6 +75,7 @@ class PerceptronModel(Module):
         score = self(x)
 
         "*** YOUR CODE HERE ***"
+        return 1 if score >= 0 else -1
 
 
 
