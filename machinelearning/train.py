@@ -31,7 +31,7 @@ def train_perceptron(model, dataset):
     with no_grad():
         dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
         "*** YOUR CODE HERE ***"
-        for _ in range(200):
+        for _ in range(35):
             for batch in dataloader:
                 features = batch['x']
                 y_star = batch['label']
@@ -57,6 +57,18 @@ def train_regression(model, dataset):
         
     """
     "*** YOUR CODE HERE ***"
+    dataloader = DataLoader(dataset, batch_size=16, shuffle=True) 
+    
+    lr = 0.01
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    for _ in range(50):
+        for batch in dataloader:
+            optimizer.zero_grad()
+            predicted_y = model(batch['x'])
+            loss = regression_loss(predicted_y, batch['label'])
+            loss.backward()
+            optimizer.step()
 
 
 def train_digitclassifier(model, dataset):
