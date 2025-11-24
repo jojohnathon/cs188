@@ -29,6 +29,7 @@ def digitclassifier_loss(y_pred, y):
     Returns: a loss tensor
     """
     """ YOUR CODE HERE """
+    return cross_entropy(y_pred, y)
 
 
 def languageid_loss(y_pred, y):
@@ -46,6 +47,7 @@ def languageid_loss(y_pred, y):
     Returns: a loss node
     """
     "*** YOUR CODE HERE ***"
+    return cross_entropy(y_pred, y)
 
 
 def digitconvolution_Loss(y_pred, y):
@@ -62,4 +64,5 @@ def digitconvolution_Loss(y_pred, y):
     Returns: a loss tensor
     """
     """ YOUR CODE HERE """
+    return cross_entropy(y_pred, y)
     

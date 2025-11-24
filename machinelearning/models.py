@@ -134,6 +134,9 @@ class DigitClassificationModel(Module):
         input_size = 28 * 28
         output_size = 10
         "*** YOUR CODE HERE ***"
+        self.layer1 = Linear(input_size, 512)
+        self.layer2 = Linear(512, 512)
+        self.layer3 = Linear(512, output_size)
 
 
     def forward(self, x):
@@ -151,7 +154,10 @@ class DigitClassificationModel(Module):
                 (also called logits)
         """
         """ YOUR CODE HERE """
-
+        x = relu(self.layer1(x))
+        x = relu(self.layer2(x))
+        x = self.layer3(x)
+        return x
 
 
 class LanguageIDModel(Module):
@@ -173,6 +179,10 @@ class LanguageIDModel(Module):
         super(LanguageIDModel, self).__init__()
         "*** YOUR CODE HERE ***"
         # Initialize your model parameters here
+        d = 256
+        self.layer1 = Linear(self.num_chars, d)
+        self.layer2 = Linear(d, d)
+        self.layer3 = Linear(d, len(self.languages))
 
 
 
@@ -206,6 +216,17 @@ class LanguageIDModel(Module):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        h = None
+        for i, x in enumerate(xs):
+            if i == 0:
+                z = self.layer1(x)
+            else:
+                z = self.layer1(x) + self.layer2(h)
+            
+            h = relu(z)
+        
+        return self.layer3(h)
+
 
 
 
@@ -229,7 +250,15 @@ def Convolve(input: tensor, weight: tensor):
     weight_dimensions = weight.shape
     Output_Tensor = tensor(())
     "*** YOUR CODE HERE ***"
+    output_h = input_tensor_dimensions[0] - weight_dimensions[0] + 1
+    output_w = input_tensor_dimensions[1] - weight_dimensions[1] + 1
 
+    Output_Tensor = zeros((output_h, output_w))
+
+    for y in range(output_h):
+        for x in range(output_w):
+            window = input[y:y+weight_dimensions[0], x:x+weight_dimensions[1]]
+            Output_Tensor[y, x] = tensordot(window, weight, dims=2)
     "*** End Code ***"
     return Output_Tensor
 
@@ -253,7 +282,8 @@ class DigitConvolutionalModel(Module):
 
         self.convolution_weights = Parameter(ones((3, 3)))
         """ YOUR CODE HERE """
-
+        self.layer1 = Linear(676, 128)
+        self.layer2 = Linear(128, output_size)
 
     def forward(self, x):
         """
@@ -266,6 +296,9 @@ class DigitConvolutionalModel(Module):
         )
         x = x.flatten(start_dim=1)
         """ YOUR CODE HERE """
+        x = relu(self.layer1(x))
+        x = self.layer2(x)
+        return x
 
 
 class Attention(Module):
@@ -305,4 +338,19 @@ class Attention(Module):
         B, T, C = input.size()
 
         """YOUR CODE HERE"""
+        Q = self.q_layer(input)
+        K = self.k_layer(input)
+        V = self.v_layer(input)
+        
+        K_T = movedim(K, 1, 2)
+        
+        M = matmul(Q, K_T) / (self.layer_size ** 0.5)
+        
+        M = M.masked_fill(self.mask[:,:,:T,:T] == 0, float('-inf'))[0]
+        
+        attention = softmax(M, dim=-1)
+        
+        return matmul(attention, V)
+        
+        
 

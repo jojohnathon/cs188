@@ -57,12 +57,12 @@ def train_regression(model, dataset):
         
     """
     "*** YOUR CODE HERE ***"
-    dataloader = DataLoader(dataset, batch_size=16, shuffle=True) 
-    
-    lr = 0.01
+    dataloader = DataLoader(dataset, batch_size=32, shuffle=True) 
+
+    lr = 0.005
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
-    for _ in range(50):
+    for _ in range(150):
         for batch in dataloader:
             optimizer.zero_grad()
             predicted_y = model(batch['x'])
@@ -77,6 +77,20 @@ def train_digitclassifier(model, dataset):
     """
     model.train()
     """ YOUR CODE HERE """
+    dataloader = DataLoader(dataset, batch_size=128, shuffle=True) 
+    
+    lr = 0.004
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    # scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.90)
+    for _ in range(2):
+        for batch in dataloader:
+            optimizer.zero_grad()
+            predicted_y = model(batch['x'])
+            loss = digitclassifier_loss(predicted_y, batch['label'])
+            loss.backward()
+            optimizer.step()
+        # scheduler.step()
 
 
 def train_languageid(model, dataset):
@@ -95,6 +109,20 @@ def train_languageid(model, dataset):
     """
     model.train()
     "*** YOUR CODE HERE ***"
+    dataloader = DataLoader(dataset, batch_size=32, shuffle=True) 
+    
+    lr = 0.002
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    for _ in range(25):
+        for batch in dataloader:
+            x = movedim(batch['x'], 0, 1)
+            
+            optimizer.zero_grad()
+            predicted_y = model(x)
+            loss = languageid_loss(predicted_y, batch['label'])
+            loss.backward()
+            optimizer.step()
 
 
 
@@ -103,3 +131,15 @@ def Train_DigitConvolution(model, dataset):
     Trains the model.
     """
     """ YOUR CODE HERE """
+    dataloader = DataLoader(dataset, batch_size=32, shuffle=True) 
+    
+    lr = 0.001
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    for _ in range(10):
+        for batch in dataloader:
+            optimizer.zero_grad()
+            predicted_y = model(batch['x'])
+            loss = digitconvolution_Loss(predicted_y, batch['label'])
+            loss.backward()
+            optimizer.step()
